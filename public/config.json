@@ -5,7 +5,7 @@
         "icon": "icon.png",
         "category": "custom"
     },
-    "type": "Rest",
+    "type": "REST",
     "lang": {
         "en-US": {
         "name": "REST Activity Demo",

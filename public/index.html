@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>VoiceBot Demo Activity</title>
+</head>
+<body style="font-family: Arial; padding: 20px;">
+    <h3>VoiceBot Demo Activity - Config UI</h3>
+    <p>OK: index.html cargado.</p>
+
+    <script>
+        // handshake básico con Journey Builder (postMessage)
+        parent.postMessage({ type: "ready" }, "*");
+        window.addEventListener("message", (e) => console.log("JB message:", e.data));
+    </script>
+</body>
+</html>

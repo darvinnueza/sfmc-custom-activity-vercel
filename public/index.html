@@ -1,98 +1,56 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8" />
-    <title>VoiceBot Demo Activity - Config</title>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>VoiceBot Demo Activity</title>
 
-    <style>
-        body {
-        font-family: Arial, sans-serif;
-        padding: 20px;
-        }
-        h3 {
-        margin-top: 0;
-        }
-    </style>
+        <!-- Requeridos por el tutorial -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+
+        <script>
+            (function () {
+                require.config({
+                baseUrl: "/js",
+                paths: {
+                    postmonger: "https://cdnjs.cloudflare.com/ajax/libs/postmonger/0.0.16/postmonger"
+                }
+                });
+
+                require(["customActivity"], function () {});
+            })();
+        </script>
+
+        <style>
+            body { padding: 20px; margin: 0; font-family: Arial, sans-serif; }
+            .row { margin: 10px 0; }
+            input { width: 320px; padding: 8px; }
+            small { color: #666; }
+        </style>
     </head>
 
     <body>
+        <h3>VoiceBot Demo Activity</h3>
 
-    <h3>VoiceBot Demo Activity - Config UI</h3>
-    <p>UI cargada correctamente.</p>
+        <div class="row">
+            <label>request_id</label><br />
+            <input id="request_id" placeholder="ej: 100" />
+            <br /><small>Se guarda en inArguments</small>
+        </div>
 
-    <!-- Postmonger (OBLIGATORIO) -->
-    <script src="https://unpkg.com/postmonger/postmonger.js"></script>
+        <div class="row">
+            <label>phone_number</label><br />
+            <input id="phone_number" placeholder="ej: 0987081772" />
+        </div>
 
-    <script>
-        /**
-        * Sesión con Journey Builder
-        */
-        const connection = new Postmonger.Session();
+        <div class="row">
+            <label>status</label><br />
+            <input id="status" placeholder="ej: P" />
+        </div>
 
-        /**
-        * Activity actual (payload que envía Journey Builder)
-        */
-        let activity = null;
-
-        /**
-        * 1️⃣ Avisar a Journey Builder que la UI ya cargó
-        *    (quita el spinner)
-        */
-        connection.trigger('ready');
-
-        /**
-        * 2️⃣ Recibir el payload inicial de la activity
-        */
-        connection.on('initActivity', function (payload) {
-        console.log('initActivity payload:', payload);
-        activity = payload;
-        });
-
-        /**
-        * 3️⃣ Usuario da click en "Listo"
-        *    👉 OBLIGATORIO devolver updateActivity
-        */
-        connection.on('clickedNext', function () {
-        console.log('clickedNext');
-
-        // Seguridad mínima
-        if (!activity) {
-            activity = {
-            arguments: {},
-            metaData: {}
-            };
-        }
-
-        // Marcar activity como configurada
-        activity.metaData = activity.metaData || {};
-        activity.metaData.isConfigured = true;
-
-        // Definir argumentos de ejecución (execute)
-        activity.arguments = activity.arguments || {};
-        activity.arguments.execute = activity.arguments.execute || {};
-
-        activity.arguments.execute.inArguments = [
-            { contactKey: "{{Contact.Key}}" },
-            { email: "{{Contact.Default.Email}}" }
-        ];
-
-        activity.arguments.execute.url =
-            "https://sfmc-custom-activity-vercel.vercel.app/api/execute";
-
-        /**
-        * 🔴 ESTE EVENTO CIERRA EL MODAL
-        *    y guarda la configuración
-        */
-        connection.trigger('updateActivity', activity);
-        });
-
-        /**
-        * 4️⃣ (Opcional) Botón "Atrás"
-        */
-        connection.on('clickedBack', function () {
-        connection.trigger('prevStep');
-        });
-    </script>
-
-</body>
+        <div class="row">
+            <button id="btnDone">Listo (Done)</button>
+            <small id="msg"></small>
+        </div>
+    </body>
 </html>

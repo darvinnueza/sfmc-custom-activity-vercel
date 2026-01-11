@@ -1,4 +1,5 @@
 {
+    "cleanUrls": true,
     "rewrites": [
         { "source": "/config.json", "destination": "/api/config" }
     ]

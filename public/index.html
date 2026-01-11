@@ -1,32 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="utf-8" />
     <title>VoiceBot Demo Activity</title>
-
-    <script type="text/javascript" src="js/require.js"></script>
-
-    <style>
-        body { font-family: Arial; padding: 16px; margin: 0; }
-        .row { margin-top: 10px; }
-        input { width: 250px; padding: 6px; }
-    </style>
+    <script src="https://unpkg.com/postmonger@0.0.15/postmonger.js"></script>
+    <style>body{font-family:Arial;padding:16px;margin:0}</style>
     </head>
-    <body>
+<body>
     <h3>VoiceBot Demo Activity</h3>
 
-    <div class="row">
-        <label>request_id</label><br/>
-        <input id="request_id" placeholder="ej: 100" />
-        <div style="font-size:12px;opacity:.7;margin-top:6px;">Se guarda en inArguments</div>
-    </div>
+    <label>request_id</label><br/>
+    <input id="request_id" placeholder="ej: 100"/>
 
     <script>
-        require.config({
-        baseUrl: "js"
+        const connection = new Postmonger.Session();
+        let payload = {};
+
+        connection.on("initActivity", (data) => {
+        payload = data || {};
+        connection.trigger("ready"); // <- quita el spinner
         });
 
-        require(["customActivity"], function(){});
+        connection.on("clickedNext", () => {
+        payload.arguments.execute.inArguments = [
+            { request_id: document.getElementById("request_id").value }
+        ];
+        payload.metaData.isConfigured = true;
+        connection.trigger("updateActivity", payload);
+        });
+
+        connection.trigger("ready");
     </script>
 </body>
 </html>

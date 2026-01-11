@@ -25,12 +25,9 @@ module.exports = (req, res) => {
       execute: {
         inArguments: [
           {
-            request_id: "{{Contact.Attribute.VOICEBOT_DEMO_CAMPAIGN_1.request_id}}",
-            contact_key: "{{Contact.Attribute.VOICEBOT_DEMO_CAMPAIGN_1.contact_key}}",
-            phone_number: "{{Contact.Attribute.VOICEBOT_DEMO_CAMPAIGN_1.phone_number}}",
-            status: "{{Contact.Attribute.VOICEBOT_DEMO_CAMPAIGN_1.status}}",
-            created_at: "{{Contact.Attribute.VOICEBOT_DEMO_CAMPAIGN_1.created_at}}",
-            updated_at: "{{Contact.Attribute.VOICEBOT_DEMO_CAMPAIGN_1.updated_at}}"
+            request_id: "100",
+            contact_key: "100",
+            phone_number: "0987081772"
           }
         ],
         outArguments: [],

@@ -21,12 +21,12 @@
 
         // ✅ AQUÍ guardas los bindings que quieres que SFMC resuelva al ejecutar
         payload.arguments.execute.inArguments = [
-            { request_id: "{{Event.request_id}}" },
-            { contact_key: "{{Event.contact_key}}" },
-            { phone_number: "{{Event.phone_number}}" },
-            { status: "{{Event.status}}" },
-            { created_at: "{{Event.created_at}}" },
-            { updated_at: "{{Event.updated_at}}" }
+            { request_id: "{{Event.VOICEBOT_DEMO_CAMPAIGN_1.request_id}}" },
+            { contact_key: "{{Event.VOICEBOT_DEMO_CAMPAIGN_1.contact_key}}" },
+            { phone_number: "{{Event.VOICEBOT_DEMO_CAMPAIGN_1.phone_number}}" },
+            { status: "{{Event.VOICEBOT_DEMO_CAMPAIGN_1.status}}" },
+            { created_at: "{{Event.VOICEBOT_DEMO_CAMPAIGN_1.created_at}}" },
+            { updated_at: "{{Event.VOICEBOT_DEMO_CAMPAIGN_1.updated_at}}" }
         ];
 
         payload.metaData.isConfigured = true;

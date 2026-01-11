@@ -13,9 +13,16 @@
   },
   "arguments": {
     "execute": {
-      "inArguments": [],
-      "outArguments": [],
-      "url": "https://sfmc-custom-activity-vercel.vercel.app/api/execute"
+        "inArguments": [
+          { "request_id": "{{Event.request_id}}" },
+          { "contact_key": "{{Event.contact_key}}" },
+          { "phone_number": "{{Event.phone_number}}" },
+          { "status": "{{Event.status}}" },
+          { "created_at": "{{Event.created_at}}" },
+          { "updated_at": "{{Event.updated_at}}" }
+        ],
+        "outArguments": [],
+        "url": "https://sfmc-custom-activity-vercel.vercel.app/api/execute"
     }
   },
   "configurationArguments": {

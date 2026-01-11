@@ -1,18 +1,30 @@
 <!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>VoiceBot Demo Activity</title>
-</head>
-<body style="font-family: Arial; padding: 20px;">
-    <h3>VoiceBot Demo Activity - Config UI</h3>
-    <p>OK: index.html cargado.</p>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>VoiceBot Config</title>
+    </head>
+    <body>
+        <h3>VoiceBot Demo Activity - Config UI</h3>
+        <p>UI cargada.</p>
 
-    <script>
-        // handshake básico con Journey Builder (postMessage)
-        parent.postMessage({ type: "ready" }, "*");
-        window.addEventListener("message", (e) => console.log("JB message:", e.data));
-    </script>
-</body>
+        <!-- Postmonger (CDN) -->
+        <script src="https://unpkg.com/postmonger/postmonger.js"></script>
+
+        <script>
+        // 1) abrir sesión con Journey Builder
+        const connection = new Postmonger.Session();
+
+        // 2) ESTE ES EL PUNTO CLAVE: quitar el spinner
+        connection.trigger('ready');
+
+        // opcional: para ver que sí llega el init
+        connection.on('initActivity', function(payload){
+            console.log('initActivity payload:', payload);
+        });
+
+        // opcional: para cerrar bien cuando das “Listo”
+        // connection.trigger('updateActivity', payload)
+        </script>
+    </body>
 </html>

@@ -1,8 +1,14 @@
-module.exports = async (req, res) => {
-    if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
+export default async function handler(req, res) {
+    try {
+        const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
 
-    console.log("=== EXECUTE CALLED ===");
-    console.log(JSON.stringify(req.body, null, 2));
+        const inArguments = body?.inArguments?.[0] || {};
 
-    return res.status(200).json({ status: "ok" });
-};
+        console.log("IN_ARGUMENTS:", JSON.stringify(inArguments, null, 2));
+
+        return res.status(200).json({ success: true });
+    } catch (error) {
+        console.error("ERROR execute:", error);
+        return res.status(500).json({ success: false });
+    }
+}

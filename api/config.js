@@ -17,8 +17,14 @@ module.exports = (req, res) => {
         arguments: {
             execute: {
                 inArguments: [
-                    { contactKey: "{{Contact.Key}}" },
-                    { email: "{{Contact.Default.Email}}" }
+                    {
+                        request_id: "{{Event.request_id}}",
+                        contact_key: "{{Event.contact_key}}",
+                        phone_number: "{{Event.phone_number}}",
+                        status: "{{Event.status}}",
+                        created_at: "{{Event.created_at}}",
+                        updated_at: "{{Event.updated_at}}"
+                    }
                 ],
                 outArguments: [],
                 url: `${baseUrl}/api/execute`,
@@ -27,7 +33,7 @@ module.exports = (req, res) => {
                 retryDelay: 0,
                 concurrentRequests: 1
             }
-        },
+        },      
         configurationArguments: {
             publish: { url: `${baseUrl}/api/publish` },
             validate: { url: `${baseUrl}/api/validate` },

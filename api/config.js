@@ -1,5 +1,4 @@
-export default function handler(req, res) {
-    // Base URL dinámico (funciona en Vercel sin hardcode)
+module.exports = (req, res) => {
     const proto = (req.headers["x-forwarded-proto"] || "https");
     const host = req.headers["x-forwarded-host"] || req.headers.host;
     const baseUrl = `${proto}://${host}`;
@@ -13,16 +12,13 @@ export default function handler(req, res) {
         },
         type: "REST",
         lang: {
-            "en-US": {
-                name: "VoiceBot Demo Activity",
-                description: "Demo Custom Activity (REST) on Vercel"
-            }
+            "en-US": { name: "VoiceBot Demo Activity", description: "Demo Custom Activity (REST) on Vercel" }
         },
         arguments: {
             execute: {
                 inArguments: [
-                    { "contactKey": "{{Contact.Key}}" },
-                    { "email": "{{Contact.Default.Email}}" }
+                    { contactKey: "{{Contact.Key}}" },
+                    { email: "{{Contact.Default.Email}}" }
                 ],
                 outArguments: [],
                 url: `${baseUrl}/api/execute`,
@@ -42,4 +38,4 @@ export default function handler(req, res) {
             runningSupport: `${baseUrl}/ui/running.html`
         }
     });
-}
+};

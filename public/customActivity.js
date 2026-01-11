@@ -1,30 +1,27 @@
-/* global Postmonger */
-
 (function () {
-    // Carga Postmonger desde CDN (rápido para demo)
-    const s = document.createElement("script");
-    s.src = "https://cdn.jsdelivr.net/npm/postmonger@0.0.16/postmonger.js";
-    s.onload = init;
-    document.head.appendChild(s);
+    const connection = new Postmonger.Session();
+    let payload = {};
 
-    function init() {
-        const connection = new Postmonger.Session();
-        const status = document.getElementById("status");
+    const statusEl = document.getElementById("status");
+    const btnSave = document.getElementById("btnSave");
 
-        connection.on("ready", () => {
-            status.innerText = "READY (Postmonger connected)";
-            // Pide datos del Journey (útil para data binding luego)
-            connection.trigger("requestSchema");
-            connection.trigger("requestTriggerEventDefinition");
-            connection.trigger("requestInteraction");
-        });
+    connection.on("ready", () => {
+        statusEl.innerText = "READY (Postmonger connected)";
+        connection.trigger("requestInteraction");
+        connection.trigger("requestTriggerEventDefinition");
+        connection.trigger("requestSchema");
+    });
 
-        // Para ver que te llegan respuestas
-        connection.on("requestedSchema", (schema) => console.log("SCHEMA:", schema));
-        connection.on("requestedInteraction", (interaction) => console.log("INTERACTION:", interaction));
-        connection.on("requestedTriggerEventDefinition", (ted) => console.log("TRIGGER EVENT DEF:", ted));
+    connection.on("initActivity", (data) => {
+        payload = data || {};
+        console.log("INIT ACTIVITY:", payload);
+    });
 
-        // Importante: avisa que tu iframe está listo
-        connection.trigger("ready");
-    }
+    btnSave.addEventListener("click", () => {
+        console.log("SAVING ACTIVITY PAYLOAD:", payload);
+        connection.trigger("updateActivity", payload);
+        connection.trigger("done");
+    });
+
+    connection.trigger("ready");
 })();

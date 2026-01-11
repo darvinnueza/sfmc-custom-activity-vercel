@@ -1,56 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <title>VoiceBot Demo Activity</title>
+<head>
+    <meta charset="utf-8" />
+    <title>VoiceBot Demo Activity</title>
 
-        <!-- Requeridos por el tutorial -->
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+    <script type="text/javascript" src="js/require.js"></script>
 
-        <script>
-            (function () {
-                require.config({
-                baseUrl: "/js",
-                paths: {
-                    postmonger: "https://cdnjs.cloudflare.com/ajax/libs/postmonger/0.0.16/postmonger"
-                }
-                });
-
-                require(["customActivity"], function () {});
-            })();
-        </script>
-
-        <style>
-            body { padding: 20px; margin: 0; font-family: Arial, sans-serif; }
-            .row { margin: 10px 0; }
-            input { width: 320px; padding: 8px; }
-            small { color: #666; }
-        </style>
+    <style>
+        body { font-family: Arial; padding: 16px; margin: 0; }
+        .row { margin-top: 10px; }
+        input { width: 250px; padding: 6px; }
+    </style>
     </head>
-
     <body>
-        <h3>VoiceBot Demo Activity</h3>
+    <h3>VoiceBot Demo Activity</h3>
 
-        <div class="row">
-            <label>request_id</label><br />
-            <input id="request_id" placeholder="ej: 100" />
-            <br /><small>Se guarda en inArguments</small>
-        </div>
+    <div class="row">
+        <label>request_id</label><br/>
+        <input id="request_id" placeholder="ej: 100" />
+        <div style="font-size:12px;opacity:.7;margin-top:6px;">Se guarda en inArguments</div>
+    </div>
 
-        <div class="row">
-            <label>phone_number</label><br />
-            <input id="phone_number" placeholder="ej: 0987081772" />
-        </div>
+    <script>
+        require.config({
+        baseUrl: "js"
+        });
 
-        <div class="row">
-            <label>status</label><br />
-            <input id="status" placeholder="ej: P" />
-        </div>
-
-        <div class="row">
-            <button id="btnDone">Listo (Done)</button>
-            <small id="msg"></small>
-        </div>
-    </body>
+        require(["customActivity"], function(){});
+    </script>
+</body>
 </html>

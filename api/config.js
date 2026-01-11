@@ -8,8 +8,7 @@ module.exports = (req, res) => {
 
     metaData: {
       icon: "https://www.svgrepo.com/show/354243/salesforce.svg",
-      category: "message",
-      isConfigured: true
+      category: "message"
     },
 
     type: "REST",
@@ -41,29 +40,18 @@ module.exports = (req, res) => {
     },
 
     configurationArguments: {
+      save: { url: `${baseUrl}/api/publish` },   // puedes apuntar save a publish por ahora
       publish: { url: `${baseUrl}/api/publish` },
       validate: { url: `${baseUrl}/api/validate` },
       stop: { url: `${baseUrl}/api/stop` }
     },
 
     userInterfaces: {
-      configurationSupport: `${baseUrl}/index.html`,
-      runningSupport: `${baseUrl}/index.html`
-    },
-
-    schema: {
-      arguments: {
-        execute: {
-          inArguments: [
-            { request_id: { dataType: "Text", isNullable: true, direction: "in" } },
-            { contact_key: { dataType: "Text", isNullable: true, direction: "in" } },
-            { phone_number: { dataType: "Text", isNullable: true, direction: "in" } },
-            { status: { dataType: "Text", isNullable: true, direction: "in" } },
-            { created_at: { dataType: "Date", isNullable: true, direction: "in" } },
-            { updated_at: { dataType: "Date", isNullable: true, direction: "in" } }
-          ],
-          outArguments: []
-        }
+      configModal: {
+        url: `${baseUrl}/index.html`,
+        height: 260,
+        width: 600,
+        fullscreen: false
       }
     }
   });

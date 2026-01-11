@@ -1,30 +1,98 @@
-<!doctype html>
-<html>
-    <head>
-        <meta charset="utf-8" />
-        <title>VoiceBot Config</title>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>VoiceBot Demo Activity - Config</title>
+
+    <style>
+        body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        }
+        h3 {
+        margin-top: 0;
+        }
+    </style>
     </head>
+
     <body>
-        <h3>VoiceBot Demo Activity - Config UI</h3>
-        <p>UI cargada.</p>
 
-        <!-- Postmonger (CDN) -->
-        <script src="https://unpkg.com/postmonger/postmonger.js"></script>
+    <h3>VoiceBot Demo Activity - Config UI</h3>
+    <p>UI cargada correctamente.</p>
 
-        <script>
-        // 1) abrir sesión con Journey Builder
+    <!-- Postmonger (OBLIGATORIO) -->
+    <script src="https://unpkg.com/postmonger/postmonger.js"></script>
+
+    <script>
+        /**
+        * Sesión con Journey Builder
+        */
         const connection = new Postmonger.Session();
 
-        // 2) ESTE ES EL PUNTO CLAVE: quitar el spinner
+        /**
+        * Activity actual (payload que envía Journey Builder)
+        */
+        let activity = null;
+
+        /**
+        * 1️⃣ Avisar a Journey Builder que la UI ya cargó
+        *    (quita el spinner)
+        */
         connection.trigger('ready');
 
-        // opcional: para ver que sí llega el init
-        connection.on('initActivity', function(payload){
-            console.log('initActivity payload:', payload);
+        /**
+        * 2️⃣ Recibir el payload inicial de la activity
+        */
+        connection.on('initActivity', function (payload) {
+        console.log('initActivity payload:', payload);
+        activity = payload;
         });
 
-        // opcional: para cerrar bien cuando das “Listo”
-        // connection.trigger('updateActivity', payload)
-        </script>
-    </body>
+        /**
+        * 3️⃣ Usuario da click en "Listo"
+        *    👉 OBLIGATORIO devolver updateActivity
+        */
+        connection.on('clickedNext', function () {
+        console.log('clickedNext');
+
+        // Seguridad mínima
+        if (!activity) {
+            activity = {
+            arguments: {},
+            metaData: {}
+            };
+        }
+
+        // Marcar activity como configurada
+        activity.metaData = activity.metaData || {};
+        activity.metaData.isConfigured = true;
+
+        // Definir argumentos de ejecución (execute)
+        activity.arguments = activity.arguments || {};
+        activity.arguments.execute = activity.arguments.execute || {};
+
+        activity.arguments.execute.inArguments = [
+            { contactKey: "{{Contact.Key}}" },
+            { email: "{{Contact.Default.Email}}" }
+        ];
+
+        activity.arguments.execute.url =
+            "https://sfmc-custom-activity-vercel.vercel.app/api/execute";
+
+        /**
+        * 🔴 ESTE EVENTO CIERRA EL MODAL
+        *    y guarda la configuración
+        */
+        connection.trigger('updateActivity', activity);
+        });
+
+        /**
+        * 4️⃣ (Opcional) Botón "Atrás"
+        */
+        connection.on('clickedBack', function () {
+        connection.trigger('prevStep');
+        });
+    </script>
+
+</body>
 </html>

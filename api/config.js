@@ -17,14 +17,14 @@ module.exports = (req, res) => {
         arguments: {
             execute: {
                 inArguments: [
-                    {
-                        request_id: "{{Event.request_id}}",
-                        contact_key: "{{Event.contact_key}}",
-                        phone_number: "{{Event.phone_number}}",
-                        status: "{{Event.status}}",
-                        created_at: "{{Event.created_at}}",
-                        updated_at: "{{Event.updated_at}}"
-                    }
+                {
+                    request_id: "{{Contact.Attribute.VOICEBOT_DEMO_CAMPAIGN_1.request_id}}",
+                    contact_key: "{{Contact.Attribute.VOICEBOT_DEMO_CAMPAIGN_1.contact_key}}",
+                    phone_number: "{{Contact.Attribute.VOICEBOT_DEMO_CAMPAIGN_1.phone_number}}",
+                    status: "{{Contact.Attribute.VOICEBOT_DEMO_CAMPAIGN_1.status}}",
+                    created_at: "{{Contact.Attribute.VOICEBOT_DEMO_CAMPAIGN_1.created_at}}",
+                    updated_at: "{{Contact.Attribute.VOICEBOT_DEMO_CAMPAIGN_1.updated_at}}"
+                }
                 ],
                 outArguments: [],
                 url: `${baseUrl}/api/execute`,

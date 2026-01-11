@@ -1,15 +1,19 @@
 export default async function handler(req, res) {
     try {
-        const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+        // body completo
+        console.log("BODY COMPLETO:", JSON.stringify(req.body, null, 2));
 
-        console.log("BODY COMPLETO:", JSON.stringify(body, null, 2));
+        const inArgsArray = req.body?.inArguments || [];
+        const merged = Object.assign({}, ...inArgsArray);
 
-        const inArguments = body?.inArguments?.[0] || {};
-        console.log("IN_ARGUMENTS:", JSON.stringify(inArguments, null, 2));
+        console.log("IN_ARGUMENTS (MERGED):", JSON.stringify(merged, null, 2));
 
-        return res.status(200).json({ success: true });
-    } catch (e) {
-        console.error("ERROR:", e);
-        return res.status(500).json({ success: false });
+        return res.status(200).json({
+        status: "ok",
+        received: merged
+        });
+    } catch (err) {
+        console.error("ERROR execute:", err);
+        return res.status(500).json({ status: "error", message: err?.message });
     }
 }

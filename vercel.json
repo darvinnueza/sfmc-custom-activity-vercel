@@ -1,5 +1,14 @@
 {
-    "rewrites": [
-        { "source": "/config.json", "destination": "/api/config" }
+    "routes": [
+        { "src": "/config.json", "dest": "/config.json" },
+        { "src": "/index.html", "dest": "/index.html" },
+        { "src": "/customActivity.js", "dest": "/customActivity.js" },
+        { "src": "/icon.png", "dest": "/icon.png" },
+
+        { "src": "/execute", "dest": "/execute" },
+        { "src": "/save", "dest": "/save" },
+        { "src": "/publish", "dest": "/publish" },
+        { "src": "/validate", "dest": "/validate" },
+        { "src": "/stop", "dest": "/stop" }
     ]
 }

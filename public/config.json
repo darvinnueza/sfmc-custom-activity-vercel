@@ -1,0 +1,46 @@
+{
+    "key": "c1dad13e-ef98-4d7b-887b-f9b75991f479",
+    "workflowApiVersion": "1.1",
+    "metaData": {
+        "icon": "icon.png",
+        "category": "custom"
+    },
+    "type": "Rest",
+    "lang": {
+        "en-US": {
+        "name": "REST Activity Demo",
+        "description": "Demo REST custom activity"
+        }
+    },
+    "arguments": {
+        "execute": {
+        "inArguments": [
+            {}
+        ],
+        "outArguments": [],
+        "url": "https://sfmc-custom-activity-vercel.vercel.app/execute"
+        }
+    },
+    "configurationArguments": {
+        "save": {
+        "url": "https://sfmc-custom-activity-vercel.vercel.app/save"
+        },
+        "publish": {
+        "url": "https://sfmc-custom-activity-vercel.vercel.app/publish"
+        },
+        "validate": {
+        "url": "https://sfmc-custom-activity-vercel.vercel.app/validate"
+        },
+        "stop": {
+        "url": "https://sfmc-custom-activity-vercel.vercel.app/stop"
+        }
+    },
+    "userInterfaces": {
+        "configModal": {
+        "url": "index.html",
+        "height": 600,
+        "width": 800,
+        "fullscreen": false
+        }
+    }
+}

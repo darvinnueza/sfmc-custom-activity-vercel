@@ -34,8 +34,8 @@ module.exports = (req, res) => {
             stop: { url: `${baseUrl}/api/stop` }
         },
         userInterfaces: {
-            configurationSupport: `${baseUrl}/ui/config.html`,
-            runningSupport: `${baseUrl}/ui/running.html`
+            configurationSupport: `${baseUrl}/index.html`,
+            runningSupport: `${baseUrl}/index.html`
         }
     });
 };

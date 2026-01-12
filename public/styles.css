@@ -1,5 +1,7 @@
 /* ===== Reset básico ===== */
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 html, body {
   height: 100%;
@@ -37,7 +39,7 @@ body {
 /* ===== Card ===== */
 .card {
   width: 100%;
-  max-width: 720px;            /* un poco más ancho */
+  max-width: 720px;
   background: #fff;
   border-radius: 14px;
   padding: 28px;
@@ -81,37 +83,72 @@ input[type="text"] {
 
 select:focus,
 input[type="text"]:focus {
-    border-color: #b23b35;
-    box-shadow: 0 0 0 3px rgba(178, 59, 53, 0.18);
+  border-color: #b23b35;
+  box-shadow: 0 0 0 3px rgba(178, 59, 53, 0.18);
 }
 
-/* ===== Checkbox alineado correctamente ===== */
+/* ===== Checkbox alineado ===== */
 .checkbox {
-    display: flex;
-    align-items: center;     /* 🔑 alineación vertical real */
-    gap: 12px;
-    margin-top: 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
 }
 
 .checkbox input[type="checkbox"] {
   width: 18px;
   height: 18px;
-  margin: 0;               /* 🔑 evita desplazamiento */
+  margin: 0;
   cursor: pointer;
 }
 
 .checkbox label {
-  margin: 0;               /* 🔑 quita margen heredado */
+  margin: 0;
   font-size: 14px;
   font-weight: 600;
   line-height: 1.2;
   cursor: pointer;
 }
 
+/* ===== Hint ===== */
 .hint {
   margin-top: 6px;
   font-size: 12px;
   color: #6b7280;
+}
+
+/* ===== Botón Crear Lista ===== */
+#btnCreateList {
+  margin-top: 12px;
+  height: 40px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 10px;
+  background: #b23b35;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#btnCreateList:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ===== Estado de creación ===== */
+.status {
+  display: block;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.status.ok {
+  color: #065f46;
+}
+
+.status.err {
+  color: #b91c1c;
 }
 
 /* ===== Responsive ===== */
@@ -127,30 +164,10 @@ input[type="text"]:focus {
 }
 
 /* =========================================================
-    FIX CRÍTICO SFMC / Journey Builder (NO TOCAR)
-    Evita que el modal se vea cortado o “al 50%”
+   FIX CRÍTICO SFMC / Journey Builder (NO TOCAR)
+   Evita que el modal se vea cortado
    ========================================================= */
 iframe {
   height: 100vh !important;
   min-height: 720px !important;
-}
-
-#btnCreateList{
-  margin-top:10px;
-  height:40px;
-  padding:0 14px;
-  border:0;
-  border-radius:10px;
-  background:#b23b35;
-  color:#fff;
-  font-weight:600;
-  cursor:pointer;
-}
-#btnCreateList:disabled{ opacity:.6; cursor:not-allowed; }
-
-#createStatus{
-  display:block;
-  margin-top:8px;
-  font-size:12px;
-  color:#6b7280;
 }

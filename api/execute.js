@@ -12,15 +12,16 @@ module.exports = async (req, res) => {
 
   try {
     // 1) Aceptar:
-    // - Opción A (SFMC): { inArguments: [ { ... } ] }
-    // - Opción B (PLANO): { request_id: ..., contactListId: ... }
+    // - Opción A (SFMC): { inArguments: [ { ... } ], journeyId, activityId, ... }
+    // - Opción B (PLANO): { request_id: ..., contactListId: ..., journeyId, activityId, ... }
     let merged = req.body || {};
 
     if (Array.isArray(req.body?.inArguments) && req.body.inArguments.length > 0) {
+      // ✅ importante: conservar también campos root (journeyId/activityId) + merge inArguments
       merged = req.body.inArguments.reduce((acc, item) => {
         if (item && typeof item === "object") Object.assign(acc, item);
         return acc;
-      }, {});
+      }, { ...req.body });
     }
 
     // 2) Construir objeto FINAL PLANO (Opción B) para enviar al servicio que inserta
@@ -28,11 +29,18 @@ module.exports = async (req, res) => {
       request_id: merged.request_id ?? null,
       contact_key: merged.contact_key ?? null,
       phone_number: merged.phone_number ?? null,
-      status: merged.status ?? "RECEIVED",
+
+      // ✅ FIJO: siempre RECEIVED (NO se mapea)
+      status: "RECEIVED",
+
       contactListId: merged.contactListId ?? null,
       campaignId: merged.campaignId ?? null,
       useNewList: !!merged.useNewList,
-      newListName: merged.newListName ?? ""
+      newListName: merged.newListName ?? "",
+
+      // ✅ NUEVO: para agrupar en BD
+      journeyId: merged.journeyId ?? null,
+      activityId: merged.activityId ?? null
     };
 
     console.log("EVENT_OUT (PLANO):", JSON.stringify(event, null, 2));
@@ -40,6 +48,10 @@ module.exports = async (req, res) => {
     // Validación mínima para NO mandar nulls
     if (!event.contactListId) throw new Error("Missing contactListId");
     if (!event.campaignId) throw new Error("Missing campaignId");
+
+    // ✅ si vas a agrupar por estos, déjalos obligatorios:
+    if (!event.journeyId) throw new Error("Missing journeyId");
+    if (!event.activityId) throw new Error("Missing activityId");
 
     const base = process.env.EVENTS_API_BASE; // https://custom-activity-service-demo.vercel.app
     if (!base) throw new Error("Missing env EVENTS_API_BASE");

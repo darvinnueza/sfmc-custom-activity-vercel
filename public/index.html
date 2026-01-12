@@ -35,13 +35,22 @@
           </div>
 
           <label for="newListName">Nombre de la Nueva Lista</label>
-          <input id="newListName" type="text" placeholder="Ingrese el nombre..." />
 
-          <!-- ✅ HINT (debajo del input) -->
+          <!-- ✅ Input + Botón en una misma fila -->
+          <div class="inline-create">
+            <input
+              id="newListName"
+              type="text"
+              placeholder="Ingrese el nombre..."
+            />
+
+            <button id="btnCreateList" type="button" disabled>Crear Lista</button>
+          </div>
+
+          <!-- ✅ HINT (debajo del input+botón) -->
           <p class="hint">Si activa esta opción, se ignorará la lista existente seleccionada.</p>
 
-          <!-- ✅ BOTÓN + ESTADO -->
-          <button id="btnCreateList" type="button" disabled>Crear Lista</button>
+          <!-- ✅ Estado -->
           <small id="createStatus" class="status"></small>
 
           <!-- ✅ Navegación -->

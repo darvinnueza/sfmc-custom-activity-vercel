@@ -55,10 +55,25 @@
     payload.arguments = payload.arguments || {};
     payload.arguments.execute = payload.arguments.execute || {};
 
+    // ✅ UN SOLO OBJETO con TODO
     payload.arguments.execute.inArguments = [
-      { contactListId: select ? select.value : "" },
-      { useNewList: chk ? chk.checked : false },
-      { newListName: inp ? inp.value : "" },
+      {
+        // ✅ bindings (no se pierden)
+        request_id: "{{Event.VOICEBOT_DEMO_CAMPAIGN_1.request_id}}",
+        contact_key: "{{Event.VOICEBOT_DEMO_CAMPAIGN_1.contact_key}}",
+        phone_number: "{{Event.VOICEBOT_DEMO_CAMPAIGN_1.phone_number}}",
+        status: "{{Event.VOICEBOT_DEMO_CAMPAIGN_1.status}}",
+        created_at: "{{Event.VOICEBOT_DEMO_CAMPAIGN_1.created_at}}",
+        updated_at: "{{Event.VOICEBOT_DEMO_CAMPAIGN_1.updated_at}}",
+
+        // ✅ config de tu UI
+        contactListId: select ? select.value : "",
+        useNewList: chk ? chk.checked : false,
+        newListName: chk && chk.checked ? (inp ? inp.value : "") : "",
+
+        // ✅ campaña (si ya la tienes)
+        campaignId: campaignSelect ? campaignSelect.value : ""
+      }
     ];
 
     payload.metaData.isConfigured = true;

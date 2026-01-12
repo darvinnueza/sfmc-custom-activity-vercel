@@ -8,11 +8,24 @@
 
   let savedContactListId = "";
 
-  // ✅ NUEVO: habilita/deshabilita input según checkbox
+  // NUEVO: habilita/deshabilita input según checkbox
   function toggleNewListInput() {
-    if (!chk || !inp) return;
-    inp.disabled = !chk.checked;
-    if (!chk.checked) inp.value = "";
+    if (chk.checked) {
+      // Bloquear combo y resetear
+      select.value = "";
+      select.selectedIndex = 0;
+      select.disabled = true;
+
+      // Habilitar input
+      inp.disabled = false;
+    } else {
+      // Habilitar combo
+      select.disabled = false;
+
+      // Bloquear input
+      inp.disabled = true;
+      inp.value = "";
+    }
   }
 
   /* === 1️⃣ INIT DESDE SFMC === */

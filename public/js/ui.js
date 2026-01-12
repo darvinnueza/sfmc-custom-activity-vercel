@@ -2,63 +2,30 @@
 (function () {
   const connection = new Postmonger.Session();
 
-  let select, chk, inp;
-  let pendingSelectedId = "";
+  const select = document.getElementById("contactListSelect");
+  const chk = document.getElementById("newListCheck");
+  const inp = document.getElementById("newListName");
 
-  function pushUIData() {
-    connection.trigger("saveUIData", {
-      contactListId: (select && select.value) ? select.value : "",
-      useNewList: !!(chk && chk.checked),
-      newListName: (inp && inp.value) ? inp.value : ""
-    });
-  }
+  let savedContactListId = "";
 
-  // SFMC -> UI (setear valores al abrir)
-  connection.on("showUIData", function (data) {
-    pendingSelectedId = data?.contactListId || "";
-
-    if (chk) chk.checked = !!data?.useNewList;
-    if (inp) inp.value = data?.newListName || "";
-
-    if (select && pendingSelectedId) {
-      select.value = pendingSelectedId;
-    }
+  /* === 1️⃣ INIT DESDE SFMC === */
+  connection.on("initActivity", function (data) {
+    savedContactListId = data?.arguments?.execute?.inArguments?.[0]?.contactListId || "";
+    if (chk) chk.checked = data?.arguments?.execute?.inArguments?.[0]?.useNewList || false;
+    if (inp) inp.value = data?.arguments?.execute?.inArguments?.[0]?.newListName || "";
   });
 
+  /* === 2️⃣ CARGA UI === */
   document.addEventListener("DOMContentLoaded", async () => {
-    select = document.getElementById("contactListSelect");
-    chk = document.getElementById("newListCheck");
-    inp = document.getElementById("newListName");
-
-    if (!select) return;
-
-    // listeners para ir guardando mientras cambia
-    select.addEventListener("change", () => {
-      pendingSelectedId = select.value || "";
-      pushUIData();
-    });
-    if (chk) chk.addEventListener("change", pushUIData);
-    if (inp) inp.addEventListener("input", pushUIData);
-
-    // estado inicial
     select.innerHTML = `<option value="">Cargando...</option>`;
     select.disabled = true;
 
     try {
-      // ✅ MISMO ORIGEN (NO CORS)
       const res = await fetch("/api/ui/contactlists");
-      if (!res.ok) throw new Error("HTTP " + res.status);
-
       const data = await res.json();
 
-      // reset + placeholder
-      select.innerHTML = "";
-      const ph = document.createElement("option");
-      ph.value = "";
-      ph.textContent = "Seleccione una lista...";
-      select.appendChild(ph);
+      select.innerHTML = `<option value="">Seleccione una lista...</option>`;
 
-      // opciones
       data.forEach((item) => {
         const opt = document.createElement("option");
         opt.value = item.id;
@@ -66,16 +33,38 @@
         select.appendChild(opt);
       });
 
-      // re-aplicar selección guardada
-      if (pendingSelectedId) {
-        select.value = pendingSelectedId;
+      // 🔥 APLICAR SELECCIÓN GUARDADA
+      if (savedContactListId) {
+        select.value = savedContactListId;
       }
 
       select.disabled = false;
-    } catch (err) {
-      console.error("Error cargando listas", err);
-      select.innerHTML = `<option value="">Error cargando listas</option>`;
-      select.disabled = true;
+      connection.trigger("ready"); // ⬅️ ESTO QUITA EL SPINNER
+    } catch (e) {
+      select.innerHTML = `<option>Error cargando listas</option>`;
+      connection.trigger("ready");
     }
   });
+
+  /* === 3️⃣ GUARDAR AL DAR "LISTO" === */
+  connection.on("clickedNext", save);
+  connection.on("clickedDone", save);
+
+  function save() {
+    const payload = {
+      arguments: {
+        execute: {
+          inArguments: [
+            {
+              contactListId: select.value,
+              useNewList: chk.checked,
+              newListName: inp.value
+            }
+          ]
+        }
+      }
+    };
+
+    connection.trigger("updateActivity", payload);
+  }
 })();

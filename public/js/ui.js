@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  const select = document.getElementById("campaignSelect");
+  const select = document.getElementById("contactListSelect");
 
   if (!select) return;
 

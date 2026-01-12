@@ -71,7 +71,7 @@
 
     try {
       const res = await fetch(
-        "https://custom-activity-service-demo.vercel.app/api/ui/contactlists-create",
+        "/api/ui/contactlists-create",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

@@ -1,50 +1,65 @@
-document.addEventListener("DOMContentLoaded", async () => {
+/* global Postmonger */
+(function () {
+  const connection = new Postmonger.Session();
+
   const select = document.getElementById("contactListSelect");
-  if (!select) return;
+  const chk = document.getElementById("newListCheck");
+  const inp = document.getElementById("newListName");
 
-  // Estado inicial
-  select.innerHTML = `<option>Cargando...</option>`;
-  select.disabled = true;
+  let pendingSelectedId = "";
 
-  try {
-    const url = "/api/ui/contactlists";
+  // Recibe data desde customActivity.js (initActivity)
+  connection.on("showUIData", function (data) {
+    pendingSelectedId = data?.contactListId || "";
 
-    console.log("Fetching:", url);
+    if (chk) chk.checked = !!data?.useNewList;
+    if (inp) inp.value = data?.newListName || "";
 
-    const res = await fetch(url, {
-      method: "GET",
-      cache: "no-store"
-    });
-
-    console.log("Response status:", res.status);
-
-    if (!res.ok) {
-      const text = await res.text().catch(() => "");
-      throw new Error(`HTTP ${res.status} ${text}`);
+    // Si ya cargaron opciones, aplicar selección
+    if (select && pendingSelectedId) {
+      select.value = pendingSelectedId;
     }
+  });
 
-    const data = await res.json();
+  document.addEventListener("DOMContentLoaded", async () => {
+    if (!select) return;
 
-    // reset
-    select.innerHTML = "";
-
-    // placeholder
-    const ph = document.createElement("option");
-    ph.value = "";
-    ph.textContent = "Seleccione una lista...";
-    select.appendChild(ph);
-
-    data.forEach((item) => {
-      const opt = document.createElement("option");
-      opt.value = item.id;
-      opt.textContent = item.name;
-      select.appendChild(opt);
-    });
-
-    select.disabled = false;
-  } catch (err) {
-    console.error("Error cargando listas:", err);
-    select.innerHTML = `<option>Error cargando listas</option>`;
+    // estado inicial
+    select.innerHTML = `<option value="">Cargando...</option>`;
     select.disabled = true;
-  }
-});
+
+    try {
+      // ✅ MISMO ORIGEN (evita CORS)
+      const res = await fetch("/api/ui/contactlists");
+      if (!res.ok) throw new Error("HTTP " + res.status);
+
+      const data = await res.json();
+
+      // reset + placeholder
+      select.innerHTML = "";
+      const ph = document.createElement("option");
+      ph.value = "";
+      ph.textContent = "Seleccione una lista...";
+      select.appendChild(ph);
+
+      // opciones
+      data.forEach((item) => {
+        const opt = document.createElement("option");
+        opt.value = item.id;       // id real
+        opt.textContent = item.name; // name real
+        select.appendChild(opt);
+      });
+
+      // aplicar selección previa si existía
+      if (pendingSelectedId) {
+        select.value = pendingSelectedId;
+      }
+
+      select.disabled = false;
+    } catch (err) {
+      console.error("Error cargando listas", err);
+      select.innerHTML = `<option value="">Error cargando listas</option>`;
+      select.disabled = true;
+    }
+  });
+})();

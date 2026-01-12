@@ -1,52 +1,147 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>VoiceBot - Lista de Contactos</title>
+    <title>Configuración de Lista de Contactos</title>
     <style>
-      body { font-family: Arial, sans-serif; padding: 16px; }
-      .row { margin: 12px 0; }
-      label { display: block; font-weight: 600; margin-bottom: 6px; }
-      select, input[type="text"] { width: 100%; padding: 10px; }
-      .hint { font-size: 12px; opacity: 0.8; margin-top: 6px; }
-      .box { border: 1px solid #ddd; border-radius: 8px; padding: 16px; }
-      .title { margin: 0 0 10px 0; }
+      :root {
+        --border: #111;
+        --bg: #f7f5ef;
+        --grid: rgba(0,0,0,0.07);
+      }
+
+      body {
+        margin: 0;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        background:
+          linear-gradient(to right, var(--grid) 1px, transparent 1px),
+          linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+        background-size: 28px 28px;
+        background-color: var(--bg);
+      }
+
+      .window {
+        margin: 18px;
+        border: 4px solid var(--border);
+        background: rgba(255,255,255,0.85);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+      }
+
+      .titlebar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 14px;
+        border-bottom: 3px solid var(--border);
+        background: rgba(255,255,255,0.9);
+        font-weight: 800;
+        letter-spacing: 0.3px;
+      }
+
+      .controls {
+        display: flex;
+        gap: 8px;
+      }
+
+      .btnwin {
+        width: 30px;
+        height: 26px;
+        border: 2px solid var(--border);
+        background: transparent;
+      }
+
+      .content {
+        padding: 18px 18px 22px 18px;
+      }
+
+      h2 {
+        margin: 0 0 8px 0;
+        font-size: 18px;
+      }
+
+      p {
+        margin: 0 0 18px 0;
+        font-size: 13px;
+        line-height: 1.35;
+      }
+
+      label {
+        display: block;
+        font-weight: 800;
+        margin: 14px 0 6px 0;
+      }
+
+      select, input[type="text"] {
+        width: 100%;
+        padding: 10px 12px;
+        border: 3px solid var(--border);
+        font-family: inherit;
+        font-size: 14px;
+        background: #fff;
+        outline: none;
+      }
+
+      .row {
+        margin-top: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .hint {
+        font-size: 12px;
+        opacity: 0.75;
+        margin-top: 6px;
+      }
+
+      .status {
+        margin-top: 12px;
+        font-size: 12px;
+        opacity: 0.85;
+      }
+
+      .error {
+        margin-top: 12px;
+        font-size: 12px;
+        color: #b00020;
+        font-weight: 700;
+      }
     </style>
   </head>
 
   <body>
-    <div class="box">
-      <h3 class="title">Configuración de Lista de Contactos</h3>
-      <p class="hint">
-        Elija una lista existente o defina una nueva para esta actividad.
-      </p>
-
-      <div class="row">
-        <label for="contactListSelect">Lista de Contactos Existente</label>
-        <select id="contactListSelect">
-          <option value="">Cargando...</option>
-        </select>
-      </div>
-
-      <div class="row">
-        <label>
-          <input type="checkbox" id="newListCheckbox" />
-          Definir una Nueva Lista de Contactos
-        </label>
-      </div>
-
-      <div class="row">
-        <label for="newListName">Nombre de la Nueva Lista</label>
-        <input
-          type="text"
-          id="newListName"
-          placeholder="Ingrese el nombre..."
-          disabled
-        />
-        <div class="hint">
-          Si activa esta opción, se ignorará la lista existente seleccionada.
+    <div class="window">
+      <div class="titlebar">
+        <div>Configuración de Lista de Contactos</div>
+        <div class="controls" aria-hidden="true">
+          <button class="btnwin"></button>
+          <button class="btnwin"></button>
+          <button class="btnwin"></button>
         </div>
+      </div>
+
+      <div class="content">
+        <h2>Configuración de Lista de Contactos</h2>
+        <p>Elige una lista de contactos existente o define una nueva para esta actividad de VoiceBot.</p>
+
+        <label for="existingList">Lista de Contactos Existente</label>
+        <select id="existingList">
+          <option value="">Cargando…</option>
+        </select>
+
+        <div class="row">
+          <input id="createNew" type="checkbox" />
+          <label for="createNew" style="margin:0;">Definir una Nueva Lista de Contactos</label>
+        </div>
+
+        <label for="newListName">Nombre de la Nueva Lista</label>
+        <input id="newListName" type="text" placeholder="Ingrese el nombre…" disabled />
+
+        <div class="hint">Si activa esta opción, se ignorará la lista existente seleccionada.</div>
+
+        <div id="status" class="status"></div>
+        <div id="error" class="error" style="display:none;"></div>
       </div>
     </div>
 

@@ -58,52 +58,65 @@
   }
 
   async function onCreateClick() {
-    if (!chk?.checked) return;
-
-    const name = (inp?.value || "").trim();
-    if (!name) {
-      setStatus("Ingrese un nombre para la nueva lista.", "err");
-      return;
-    }
-
-    btn.disabled = true;
-    setStatus("Creando lista...", "");
-
     try {
-      const res = await fetch(
-        "/api/ui/contactlists-create",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name })
-        }
-      );
+      if (!inp || !inp.value.trim()) return;
 
-      const data = await res.json().catch(() => ({}));
+      status.textContent = "Creando lista...";
+      status.style.color = "#6b7280";
+      btn.disabled = true;
+
+      const payload = {
+        name: inp.value.trim(),
+        columnNames: [
+          "request_id",
+          "contact_key",
+          "phone_number",
+          "status"
+        ],
+        phoneColumns: [
+          {
+            columnName: "phone_number",
+            type: "cell"
+          }
+        ]
+      };
+
+      const res = await fetch("/api/ui/contactlists-create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
 
       if (!res.ok) {
-        throw new Error(data?.error || "Error creando lista");
+        const err = await res.json();
+        throw new Error(err.error || "Error creando lista");
       }
 
-      // ✅ SOLO USAMOS id y name
-      if (!data?.id) throw new Error("Respuesta inválida: falta id");
+      const data = await res.json();
 
-      savedContactListId = data.id;
+      // actualizar UI con lo que responde el backend
+      status.textContent = `Lista creada: ${data.name}`;
+      status.style.color = "#065f46";
 
-      // feedback UI
-      setStatus(`Lista creada: ${data.name || name}`, "ok");
+      // seleccionar automáticamente la nueva lista
+      if (select) {
+        const opt = document.createElement("option");
+        opt.value = data.id;
+        opt.textContent = data.name;
+        select.appendChild(opt);
+        select.value = data.id;
+      }
 
-      // bloquear para evitar cambios luego de crear
-      if (inp) inp.disabled = true;
-      if (chk) chk.disabled = true;
-      if (btn) btn.disabled = true;
+      chk.checked = false;
+      toggleNewListInput();
 
     } catch (e) {
-      console.error(e);
-      setStatus(e.message || "Error creando lista.", "err");
+      status.textContent = e.message;
+      status.style.color = "#b91c1c";
       btn.disabled = false;
     }
-  }
+}
+
 
   /* === 1️⃣ INIT DESDE SFMC === */
   connection.on("initActivity", function (data) {

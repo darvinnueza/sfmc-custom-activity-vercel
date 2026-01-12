@@ -6,48 +6,48 @@
   const chk = document.getElementById("newListCheck");
   const inp = document.getElementById("newListName");
 
-  // ✅ NUEVO: botón + status
   const btn = document.getElementById("btnCreateList");
   const status = document.getElementById("createStatus");
 
   let savedContactListId = "";
 
-  // ✅ NUEVO: habilita/deshabilita input + combo + botón según checkbox
+  function setStatus(msg, type) {
+    if (!status) return;
+    status.textContent = msg || "";
+    status.className = "status" + (type ? " " + type : "");
+  }
+
   function toggleNewListInput() {
     const useNew = !!chk?.checked;
 
     if (useNew) {
-      // Bloquear combo y resetear
       if (select) {
         select.value = "";
         select.selectedIndex = 0;
         select.disabled = true;
       }
-
-      // Habilitar input
       if (inp) inp.disabled = false;
 
-      // ✅ habilitar botón (pero solo si hay nombre)
+      // botón solo si hay nombre
       if (btn) btn.disabled = !(inp && inp.value.trim().length > 0);
+
     } else {
-      // Habilitar combo
       if (select) select.disabled = false;
 
-      // Bloquear input
       if (inp) {
         inp.disabled = true;
         inp.value = "";
       }
 
-      // ✅ deshabilitar botón
       if (btn) btn.disabled = true;
+
+      // si vuelven a "existente", limpiamos id creado (opcional pero recomendado)
+      savedContactListId = "";
     }
 
-    // limpiar mensaje si cambias de modo
-    if (status) status.textContent = "";
+    setStatus("");
   }
 
-  // ✅ NUEVO: habilitar botón cuando escriben nombre (solo si el check está marcado)
   function onNewListNameChange() {
     if (!btn) return;
     if (!chk?.checked) {
@@ -57,28 +57,88 @@
     btn.disabled = !(inp && inp.value.trim().length > 0);
   }
 
+  async function onCreateClick() {
+    if (!chk?.checked) return;
+
+    const name = (inp?.value || "").trim();
+    if (!name) {
+      setStatus("Ingrese un nombre para la nueva lista.", "err");
+      return;
+    }
+
+    btn.disabled = true;
+    setStatus("Creando lista...", "");
+
+    try {
+      const res = await fetch(
+        "https://custom-activity-service-demo.vercel.app/api/ui/contactlists-create",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name })
+        }
+      );
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(data?.error || "Error creando lista");
+      }
+
+      // ✅ SOLO USAMOS id y name
+      if (!data?.id) throw new Error("Respuesta inválida: falta id");
+
+      savedContactListId = data.id;
+
+      // feedback UI
+      setStatus(`Lista creada: ${data.name || name}`, "ok");
+
+      // bloquear para evitar cambios luego de crear
+      if (inp) inp.disabled = true;
+      if (chk) chk.disabled = true;
+      if (btn) btn.disabled = true;
+
+    } catch (e) {
+      console.error(e);
+      setStatus(e.message || "Error creando lista.", "err");
+      btn.disabled = false;
+    }
+  }
+
   /* === 1️⃣ INIT DESDE SFMC === */
   connection.on("initActivity", function (data) {
-    savedContactListId =
-      data?.arguments?.execute?.inArguments?.[0]?.contactListId || "";
+    const args0 = data?.arguments?.execute?.inArguments?.[0] || {};
 
-    if (chk) chk.checked = data?.arguments?.execute?.inArguments?.[0]?.useNewList || false;
-    if (inp) inp.value = data?.arguments?.execute?.inArguments?.[0]?.newListName || "";
+    savedContactListId = args0.contactListId || "";
 
-    // ✅ aplicar estado al cargar
-    toggleNewListInput();
-    onNewListNameChange();
+    if (chk) chk.checked = !!args0.useNewList;
+    if (inp) inp.value = args0.newListName || "";
+
+    // si ya estaba configurado y era "crear nueva", bloquea checkbox para no romper estado
+    // (opcional, pero ayuda a que no se pierda el id guardado)
+    if (chk?.checked && savedContactListId) {
+      if (chk) chk.disabled = true;
+      if (inp) inp.disabled = true;
+      if (btn) btn.disabled = true;
+      setStatus("Lista ya creada previamente (configurada).", "ok");
+    } else {
+      toggleNewListInput();
+      onNewListNameChange();
+    }
   });
 
   /* === 2️⃣ CARGA UI === */
   document.addEventListener("DOMContentLoaded", async () => {
+    if (!select) return;
+
     select.innerHTML = `<option value="">Cargando...</option>`;
     select.disabled = true;
 
-    // ✅ estado inicial + listeners
+    // listeners
     toggleNewListInput();
     if (chk) chk.addEventListener("change", toggleNewListInput);
     if (inp) inp.addEventListener("input", onNewListNameChange);
+    if (btn) btn.addEventListener("click", onCreateClick);
 
     try {
       const res = await fetch("/api/ui/contactlists");
@@ -86,24 +146,25 @@
 
       select.innerHTML = `<option value="">Seleccione una lista...</option>`;
 
-      data.forEach((item) => {
+      (data || []).forEach((item) => {
         const opt = document.createElement("option");
         opt.value = item.id;
         opt.textContent = item.name;
         select.appendChild(opt);
       });
 
-      // 🔥 APLICAR SELECCIÓN GUARDADA (solo si NO está marcado)
-      if (savedContactListId && !chk.checked) {
+      // aplicar selección guardada solo si NO está en modo "crear nueva"
+      if (savedContactListId && !(chk && chk.checked)) {
         select.value = savedContactListId;
       }
 
-      // ✅ NO forzar select.disabled=false aquí, porque depende del checkbox
+      // NO forzar enabled: depende del checkbox
       toggleNewListInput();
 
-      connection.trigger("ready"); // ⬅️ ESTO QUITA EL SPINNER
+      connection.trigger("ready");
     } catch (e) {
-      select.innerHTML = `<option>Error cargando listas</option>`;
+      console.error(e);
+      select.innerHTML = `<option value="">Error cargando listas</option>`;
       connection.trigger("ready");
     }
   });
@@ -113,14 +174,16 @@
   connection.on("clickedDone", save);
 
   function save() {
+    const useNew = !!chk?.checked;
+
     const payload = {
       arguments: {
         execute: {
           inArguments: [
             {
-              contactListId: select.value,
-              useNewList: chk.checked,
-              newListName: chk.checked ? inp.value : ""
+              contactListId: useNew ? savedContactListId : (select?.value || ""),
+              useNewList: useNew,
+              newListName: useNew ? (inp?.value || "") : ""
             }
           ]
         }

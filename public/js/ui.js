@@ -6,36 +6,68 @@
   const chk = document.getElementById("newListCheck");
   const inp = document.getElementById("newListName");
 
+  // ✅ NUEVO: botón + status
+  const btn = document.getElementById("btnCreateList");
+  const status = document.getElementById("createStatus");
+
   let savedContactListId = "";
 
-  // NUEVO: habilita/deshabilita input según checkbox
+  // ✅ NUEVO: habilita/deshabilita input + combo + botón según checkbox
   function toggleNewListInput() {
-    if (chk.checked) {
+    const useNew = !!chk?.checked;
+
+    if (useNew) {
       // Bloquear combo y resetear
-      select.value = "";
-      select.selectedIndex = 0;
-      select.disabled = true;
+      if (select) {
+        select.value = "";
+        select.selectedIndex = 0;
+        select.disabled = true;
+      }
 
       // Habilitar input
-      inp.disabled = false;
+      if (inp) inp.disabled = false;
+
+      // ✅ habilitar botón (pero solo si hay nombre)
+      if (btn) btn.disabled = !(inp && inp.value.trim().length > 0);
     } else {
       // Habilitar combo
-      select.disabled = false;
+      if (select) select.disabled = false;
 
       // Bloquear input
-      inp.disabled = true;
-      inp.value = "";
+      if (inp) {
+        inp.disabled = true;
+        inp.value = "";
+      }
+
+      // ✅ deshabilitar botón
+      if (btn) btn.disabled = true;
     }
+
+    // limpiar mensaje si cambias de modo
+    if (status) status.textContent = "";
+  }
+
+  // ✅ NUEVO: habilitar botón cuando escriben nombre (solo si el check está marcado)
+  function onNewListNameChange() {
+    if (!btn) return;
+    if (!chk?.checked) {
+      btn.disabled = true;
+      return;
+    }
+    btn.disabled = !(inp && inp.value.trim().length > 0);
   }
 
   /* === 1️⃣ INIT DESDE SFMC === */
   connection.on("initActivity", function (data) {
-    savedContactListId = data?.arguments?.execute?.inArguments?.[0]?.contactListId || "";
+    savedContactListId =
+      data?.arguments?.execute?.inArguments?.[0]?.contactListId || "";
+
     if (chk) chk.checked = data?.arguments?.execute?.inArguments?.[0]?.useNewList || false;
     if (inp) inp.value = data?.arguments?.execute?.inArguments?.[0]?.newListName || "";
 
-    // ✅ NUEVO: aplicar estado del input al cargar
+    // ✅ aplicar estado al cargar
     toggleNewListInput();
+    onNewListNameChange();
   });
 
   /* === 2️⃣ CARGA UI === */
@@ -43,9 +75,10 @@
     select.innerHTML = `<option value="">Cargando...</option>`;
     select.disabled = true;
 
-    // ✅ NUEVO: estado inicial + listener del checkbox
+    // ✅ estado inicial + listeners
     toggleNewListInput();
     if (chk) chk.addEventListener("change", toggleNewListInput);
+    if (inp) inp.addEventListener("input", onNewListNameChange);
 
     try {
       const res = await fetch("/api/ui/contactlists");
@@ -60,12 +93,14 @@
         select.appendChild(opt);
       });
 
-      // 🔥 APLICAR SELECCIÓN GUARDADA
-      if (savedContactListId) {
+      // 🔥 APLICAR SELECCIÓN GUARDADA (solo si NO está marcado)
+      if (savedContactListId && !chk.checked) {
         select.value = savedContactListId;
       }
 
-      select.disabled = false;
+      // ✅ NO forzar select.disabled=false aquí, porque depende del checkbox
+      toggleNewListInput();
+
       connection.trigger("ready"); // ⬅️ ESTO QUITA EL SPINNER
     } catch (e) {
       select.innerHTML = `<option>Error cargando listas</option>`;
@@ -85,7 +120,6 @@
             {
               contactListId: select.value,
               useNewList: chk.checked,
-              // ✅ NUEVO: si no está marcado, guardar vacío
               newListName: chk.checked ? inp.value : ""
             }
           ]

@@ -14,31 +14,62 @@
 
     <div class="container">
       <div class="card">
-        <h2>Configuración de Lista de Contactos</h2>
-        <p class="subtitle">
-          Elige una lista de contactos existente o define una nueva para esta actividad de VoiceBot.
-        </p>
 
-        <label for="contactListSelect">Lista de Contactos Existente</label>
-        <select id="contactListSelect">
-          <option>Cargando...</option>
-        </select>
+        <!-- ===================== -->
+        <!-- STEP 1: CONTACT LISTS -->
+        <!-- ===================== -->
+        <section id="stepContact">
+          <h2>Configuración de Lista de Contactos</h2>
+          <p class="subtitle">
+            Elige una lista de contactos existente o define una nueva para esta actividad de VoiceBot.
+          </p>
 
-        <div class="checkbox">
-          <input type="checkbox" id="newListCheck" />
-          <label for="newListCheck">Definir una Nueva Lista de Contactos</label>
-        </div>
+          <label for="contactListSelect">Lista de Contactos Existente</label>
+          <select id="contactListSelect">
+            <option>Cargando...</option>
+          </select>
 
-        <label for="newListName">Nombre de la Nueva Lista</label>
-        <input id="newListName" type="text" placeholder="Ingrese el nombre..." />
+          <div class="checkbox">
+            <input type="checkbox" id="newListCheck" />
+            <label for="newListCheck">Definir una Nueva Lista de Contactos</label>
+          </div>
 
-        <!-- ✅ HINT debe ir aquí (debajo del input) -->
-        <p class="hint">Si activa esta opción, se ignorará la lista existente seleccionada.</p>
+          <label for="newListName">Nombre de la Nueva Lista</label>
+          <input id="newListName" type="text" placeholder="Ingrese el nombre..." />
 
-        <!-- ✅ BOTÓN + ESTADO -->
-        <button id="btnCreateList" type="button" disabled>Crear Lista</button>
-        <small id="createStatus" class="status"></small>
-        
+          <!-- ✅ HINT (debajo del input) -->
+          <p class="hint">Si activa esta opción, se ignorará la lista existente seleccionada.</p>
+
+          <!-- ✅ BOTÓN + ESTADO -->
+          <button id="btnCreateList" type="button" disabled>Crear Lista</button>
+          <small id="createStatus" class="status"></small>
+
+          <!-- ✅ Navegación -->
+          <div class="nav">
+            <button id="btnNext" type="button" disabled>Siguiente</button>
+          </div>
+        </section>
+
+        <!-- ===================== -->
+        <!-- STEP 2: CAMPAIGN      -->
+        <!-- ===================== -->
+        <section id="stepCampaign" style="display:none;">
+          <h2>Configuración de Campaña</h2>
+          <p class="subtitle">
+            Elige una campaña existente o define una nueva para esta actividad de VoiceBot.
+          </p>
+
+          <label for="campaignSelect">Campaña Existente</label>
+          <select id="campaignSelect">
+            <option value="">Cargando...</option>
+          </select>
+
+          <!-- ✅ Navegación -->
+          <div class="nav">
+            <button id="btnBack" type="button">Atrás</button>
+          </div>
+        </section>
+
         <!-- Postmonger + bridge -->
         <script src="js/postmonger.js"></script>
         <script src="js/customActivity.js"></script>

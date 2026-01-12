@@ -81,21 +81,31 @@ input[type="text"] {
 
 select:focus,
 input[type="text"]:focus {
-  border-color: #b23b35;
-  box-shadow: 0 0 0 3px rgba(178, 59, 53, 0.18);
+    border-color: #b23b35;
+    box-shadow: 0 0 0 3px rgba(178, 59, 53, 0.18);
 }
 
-/* ===== Checkbox ===== */
+/* ===== Checkbox alineado correctamente ===== */
 .checkbox {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 14px;
+    display: flex;
+    align-items: center;     /* 🔑 alineación vertical real */
+    gap: 12px;
+    margin-top: 18px;
 }
 
-.checkbox input {
-  width: 16px;
-  height: 16px;
+.checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;               /* 🔑 evita desplazamiento */
+  cursor: pointer;
+}
+
+.checkbox label {
+  margin: 0;               /* 🔑 quita margen heredado */
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
 }
 
 .hint {

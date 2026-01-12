@@ -1,0 +1,81 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Salesforce Sans", Arial, sans-serif;
+    background: #f4f6f9;
+}
+
+.page {
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 80px;
+}
+
+.card {
+    width: 100%;
+    max-width: 520px;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 24px 28px;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+}
+
+h2 {
+    margin: 0 0 6px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.subtitle {
+    font-size: 13px;
+    color: #5e6a7a;
+    margin-bottom: 18px;
+}
+
+label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    margin-top: 14px;
+}
+
+select,
+input[type="text"] {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid #d8dde6;
+    font-size: 13px;
+}
+
+select:focus,
+input:focus {
+    outline: none;
+    border-color: #1b96ff;
+    box-shadow: 0 0 0 1px #1b96ff;
+}
+
+.checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.checkbox label {
+    margin: 0;
+    font-weight: 500;
+}
+
+small {
+    display: block;
+    margin-top: 6px;
+    font-size: 11px;
+    color: #6b778c;
+}

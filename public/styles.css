@@ -1,4 +1,6 @@
-/* ===== Reset básico ===== */
+/* =========================
+   RESET BÁSICO
+========================= */
 * {
   box-sizing: border-box;
 }
@@ -15,7 +17,9 @@ body {
   overflow: auto;
 }
 
-/* ===== Header ===== */
+/* =========================
+   HEADER
+========================= */
 .app-header {
   height: 56px;
   background: #b23b35;
@@ -24,10 +28,12 @@ body {
   align-items: center;
   padding: 0 18px;
   font-weight: 600;
-  letter-spacing: .2px;
+  letter-spacing: 0.2px;
 }
 
-/* ===== Layout centrado ===== */
+/* =========================
+   LAYOUT
+========================= */
 .container {
   min-height: calc(100vh - 56px);
   display: flex;
@@ -36,7 +42,9 @@ body {
   padding: 36px 16px;
 }
 
-/* ===== Card ===== */
+/* =========================
+   CARD
+========================= */
 .card {
   width: 100%;
   max-width: 720px;
@@ -46,7 +54,9 @@ body {
   box-shadow: 0 14px 35px rgba(17, 24, 39, 0.12);
 }
 
-/* ===== Tipografía ===== */
+/* =========================
+   TIPOGRAFÍA
+========================= */
 .card h2 {
   margin: 0 0 6px 0;
   font-size: 22px;
@@ -60,7 +70,9 @@ body {
   line-height: 1.4;
 }
 
-/* ===== Form ===== */
+/* =========================
+   FORM
+========================= */
 label {
   display: block;
   margin: 14px 0 6px;
@@ -87,7 +99,9 @@ input[type="text"]:focus {
   box-shadow: 0 0 0 3px rgba(178, 59, 53, 0.18);
 }
 
-/* ===== Checkbox alineado ===== */
+/* =========================
+   CHECKBOX
+========================= */
 .checkbox {
   display: flex;
   align-items: center;
@@ -110,16 +124,33 @@ input[type="text"]:focus {
   cursor: pointer;
 }
 
-/* ===== Hint ===== */
+/* =========================
+   HINT
+========================= */
 .hint {
   margin-top: 6px;
   font-size: 12px;
   color: #6b7280;
 }
 
-/* ===== Botón Crear Lista ===== */
+/* =========================
+   INPUT + BOTÓN EN LÍNEA
+========================= */
+.inline-create {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 6px;
+}
+
+.inline-create #newListName {
+  flex: 1;
+}
+
+/* =========================
+   BOTÓN CREAR LISTA
+========================= */
 #btnCreateList {
-  margin-top: 12px;
   height: 40px;
   padding: 0 14px;
   border: 0;
@@ -128,6 +159,7 @@ input[type="text"]:focus {
   color: #fff;
   font-weight: 600;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 #btnCreateList:disabled {
@@ -135,7 +167,9 @@ input[type="text"]:focus {
   cursor: not-allowed;
 }
 
-/* ===== Estado de creación ===== */
+/* =========================
+   STATUS MENSAJES
+========================= */
 .status {
   display: block;
   margin-top: 8px;
@@ -151,7 +185,35 @@ input[type="text"]:focus {
   color: #b91c1c;
 }
 
-/* ===== Responsive ===== */
+/* =========================
+   NAVEGACIÓN (SIGUIENTE / ATRÁS)
+========================= */
+.nav {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+#btnNext,
+#btnBack {
+  height: 40px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 10px;
+  background: #111827;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#btnNext:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
 @media (max-width: 480px) {
   .card {
     padding: 18px;
@@ -161,35 +223,17 @@ input[type="text"]:focus {
   .app-header {
     padding: 0 14px;
   }
+
+  .inline-create {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 
 /* =========================================================
-    FIX CRÍTICO SFMC / Journey Builder (NO TOCAR)
-    Evita que el modal se vea cortado
-   ========================================================= */
+   FIX CRÍTICO SFMC / JOURNEY BUILDER (NO TOCAR)
+========================================================= */
 iframe {
   height: 100vh !important;
   min-height: 720px !important;
-}
-
-.nav {
-  display:flex;
-  gap:10px;
-  margin-top:14px;
-}
-
-#btnNext, #btnBack {
-  height:40px;
-  padding:0 14px;
-  border:0;
-  border-radius:10px;
-  background:#111827;
-  color:#fff;
-  font-weight:600;
-  cursor:pointer;
-}
-
-#btnNext:disabled {
-  opacity:.6;
-  cursor:not-allowed;
 }

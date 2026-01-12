@@ -2,34 +2,50 @@
 (function () {
   const connection = new Postmonger.Session();
 
-  const select = document.getElementById("contactListSelect");
-  const chk = document.getElementById("newListCheck");
-  const inp = document.getElementById("newListName");
-
+  let select, chk, inp;
   let pendingSelectedId = "";
 
-  // Recibe data desde customActivity.js (initActivity)
+  function pushUIData() {
+    connection.trigger("saveUIData", {
+      contactListId: (select && select.value) ? select.value : "",
+      useNewList: !!(chk && chk.checked),
+      newListName: (inp && inp.value) ? inp.value : ""
+    });
+  }
+
+  // SFMC -> UI (setear valores al abrir)
   connection.on("showUIData", function (data) {
     pendingSelectedId = data?.contactListId || "";
 
     if (chk) chk.checked = !!data?.useNewList;
     if (inp) inp.value = data?.newListName || "";
 
-    // Si ya cargaron opciones, aplicar selección
     if (select && pendingSelectedId) {
       select.value = pendingSelectedId;
     }
   });
 
   document.addEventListener("DOMContentLoaded", async () => {
+    select = document.getElementById("contactListSelect");
+    chk = document.getElementById("newListCheck");
+    inp = document.getElementById("newListName");
+
     if (!select) return;
+
+    // listeners para ir guardando mientras cambia
+    select.addEventListener("change", () => {
+      pendingSelectedId = select.value || "";
+      pushUIData();
+    });
+    if (chk) chk.addEventListener("change", pushUIData);
+    if (inp) inp.addEventListener("input", pushUIData);
 
     // estado inicial
     select.innerHTML = `<option value="">Cargando...</option>`;
     select.disabled = true;
 
     try {
-      // ✅ MISMO ORIGEN (evita CORS)
+      // ✅ MISMO ORIGEN (NO CORS)
       const res = await fetch("/api/ui/contactlists");
       if (!res.ok) throw new Error("HTTP " + res.status);
 
@@ -45,12 +61,12 @@
       // opciones
       data.forEach((item) => {
         const opt = document.createElement("option");
-        opt.value = item.id;       // id real
-        opt.textContent = item.name; // name real
+        opt.value = item.id;
+        opt.textContent = item.name;
         select.appendChild(opt);
       });
 
-      // aplicar selección previa si existía
+      // re-aplicar selección guardada
       if (pendingSelectedId) {
         select.value = pendingSelectedId;
       }

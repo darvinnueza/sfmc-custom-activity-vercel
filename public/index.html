@@ -3,12 +3,52 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Vercel Demo Activity UI</title>
+    <title>VoiceBot - Lista de Contactos</title>
+    <style>
+      body { font-family: Arial, sans-serif; padding: 16px; }
+      .row { margin: 12px 0; }
+      label { display: block; font-weight: 600; margin-bottom: 6px; }
+      select, input[type="text"] { width: 100%; padding: 10px; }
+      .hint { font-size: 12px; opacity: 0.8; margin-top: 6px; }
+      .box { border: 1px solid #ddd; border-radius: 8px; padding: 16px; }
+      .title { margin: 0 0 10px 0; }
+    </style>
   </head>
 
   <body>
-    <h3>Vercel Demo Activity UI</h3>
-    <p>If you can see this, SFMC can load the UI.</p>
+    <div class="box">
+      <h3 class="title">Configuración de Lista de Contactos</h3>
+      <p class="hint">
+        Elija una lista existente o defina una nueva para esta actividad.
+      </p>
+
+      <div class="row">
+        <label for="contactListSelect">Lista de Contactos Existente</label>
+        <select id="contactListSelect">
+          <option value="">Cargando...</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <label>
+          <input type="checkbox" id="newListCheckbox" />
+          Definir una Nueva Lista de Contactos
+        </label>
+      </div>
+
+      <div class="row">
+        <label for="newListName">Nombre de la Nueva Lista</label>
+        <input
+          type="text"
+          id="newListName"
+          placeholder="Ingrese el nombre..."
+          disabled
+        />
+        <div class="hint">
+          Si activa esta opción, se ignorará la lista existente seleccionada.
+        </div>
+      </div>
+    </div>
 
     <!-- Postmonger + bridge -->
     <script src="js/postmonger.js"></script>

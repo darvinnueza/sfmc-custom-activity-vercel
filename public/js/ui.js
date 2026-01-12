@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   select.disabled = true;
 
   try {
-    const url = "https://custom-activity-service-demo.vercel.app/api/ui/contactlists";
+    const url = "/api/ui/contactlists";
 
     console.log("Fetching:", url);
 

@@ -1,16 +1,23 @@
 export default async function handler(req, res) {
     try {
-        const r = await fetch("https://custom-activity-service-demo.vercel.app/api/ui/contactlists");
+        const upstream =
+        "https://custom-activity-service-demo.vercel.app/api/ui/contactlists";
+
+        const r = await fetch(upstream, { method: "GET" });
 
         if (!r.ok) {
-        const text = await r.text();
-        return res.status(r.status).send(text);
+        const text = await r.text().catch(() => "");
+        return res.status(r.status).send(text || "Upstream error");
         }
 
         const data = await r.json();
+
+        // CORS permitido (aunque aquí ya no es necesario si llamas same-origin)
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Content-Type", "application/json");
+
         return res.status(200).json(data);
     } catch (e) {
-        console.error("Proxy contactlists error:", e);
-        return res.status(500).json({ error: "Proxy error" });
+        return res.status(500).json({ error: "proxy_error", details: String(e) });
     }
 }

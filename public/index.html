@@ -2,51 +2,42 @@
 <html lang="es">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Custom Activity UI – VoiceBot</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Custom Activity UI — VoiceBot</title>
 
     <!-- ESTILOS -->
     <link rel="stylesheet" href="styles.css" />
   </head>
 
   <body>
-    <div class="app-header">
-      Custom Activity UI – VoiceBot
-    </div>
+    <div class="app-header">Custom Activity UI — VoiceBot</div>
 
     <div class="container">
       <div class="card">
-        <h2>Configuración de Campaña</h2>
+        <h2>Configuración de Lista de Contactos</h2>
         <p class="subtitle">
-          Elige una campaña existente o define una nueva para esta actividad de VoiceBot.
+          Elige una lista de contactos existente o define una nueva para esta actividad de VoiceBot.
         </p>
 
-        <label>Campaña Existente</label>
-        <select id="campaignSelect">
+        <label for="contactListSelect">Lista de Contactos Existente</label>
+        <select id="contactListSelect">
           <option>Cargando...</option>
         </select>
 
         <div class="checkbox">
-          <input type="checkbox" id="newCampaignCheck" />
-          <label for="newCampaignCheck">Definir una nueva campaña</label>
+          <input type="checkbox" id="newListCheck" />
+          <label for="newListCheck">Definir una Nueva Lista de Contactos</label>
         </div>
 
-        <label>Nombre de la Nueva Campaña</label>
-        <input
-          type="text"
-          id="newCampaignName"
-          placeholder="Ingresa la nueva campaña..."
-          disabled
-        />
+        <label for="newListName">Nombre de la Nueva Lista</label>
+        <input id="newListName" type="text" placeholder="Ingrese el nombre..." />
 
-        <p class="hint">
-          Si activas esta opción, se ignorará la campaña existente seleccionada.
-        </p>
+        <p class="hint">Si activa esta opción, se ignorará la lista existente seleccionada.</p>
+
+        <!-- Postmonger + bridge -->
+        <script src="js/postmonger.js"></script>
+        <script src="js/customActivity.js"></script>
       </div>
     </div>
-
-    <!-- Postmonger -->
-    <script src="js/postmonger.js"></script>
-    <script src="js/customActivity.js"></script>
   </body>
 </html>

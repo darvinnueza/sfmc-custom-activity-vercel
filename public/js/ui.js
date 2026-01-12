@@ -2,85 +2,112 @@
 (function () {
   const connection = new Postmonger.Session();
 
+  // STEP containers
+  const stepContact = document.getElementById("stepContact");
+  const stepCampaign = document.getElementById("stepCampaign");
+
+  // Step nav buttons
+  const btnNext = document.getElementById("btnNext");
+  const btnBack = document.getElementById("btnBack");
+
+  // Contact list UI
   const select = document.getElementById("contactListSelect");
   const chk = document.getElementById("newListCheck");
   const inp = document.getElementById("newListName");
 
-  const btn = document.getElementById("btnCreateList");
+  // Create list
+  const btnCreate = document.getElementById("btnCreateList");
   const status = document.getElementById("createStatus");
 
-  let savedContactListId = "";
+  // Campaign UI
+  const campaignSelect = document.getElementById("campaignSelect");
 
-  function setStatus(msg, type) {
-    if (!status) return;
-    status.textContent = msg || "";
-    status.className = "status" + (type ? " " + type : "");
+  // Saved state
+  let savedContactListId = "";
+  let savedCampaignId = "";
+
+  // -------------------------
+  // Helpers: Wizard
+  // -------------------------
+  function goTo(step) {
+    if (step === 1) {
+      stepContact.style.display = "";
+      stepCampaign.style.display = "none";
+    } else {
+      stepContact.style.display = "none";
+      stepCampaign.style.display = "";
+    }
   }
 
+  function canGoNext() {
+    // si usa nueva lista: exige nombre
+    if (chk.checked) return !!inp.value.trim();
+    // si NO usa nueva lista: exige seleccionar contactListId
+    return !!select.value;
+  }
+
+  function refreshNextButton() {
+    if (!btnNext) return;
+    btnNext.disabled = !canGoNext();
+  }
+
+  // -------------------------
+  // Contact list toggle
+  // -------------------------
   function toggleNewListInput() {
     const useNew = !!chk?.checked;
 
     if (useNew) {
-      if (select) {
-        select.value = "";
-        select.selectedIndex = 0;
-        select.disabled = true;
-      }
-      if (inp) inp.disabled = false;
+      // reset & disable combo
+      select.value = "";
+      select.selectedIndex = 0;
+      select.disabled = true;
 
-      // botón solo si hay nombre
-      if (btn) btn.disabled = !(inp && inp.value.trim().length > 0);
+      inp.disabled = false;
 
+      // botón crear: solo si hay nombre
+      btnCreate.disabled = !(inp.value.trim().length > 0);
     } else {
-      if (select) select.disabled = false;
+      select.disabled = false;
 
-      if (inp) {
-        inp.disabled = true;
-        inp.value = "";
-      }
+      inp.disabled = true;
+      inp.value = "";
 
-      if (btn) btn.disabled = true;
-
-      // si vuelven a "existente", limpiamos id creado (opcional pero recomendado)
-      savedContactListId = "";
+      btnCreate.disabled = true;
     }
 
-    setStatus("");
+    if (status) status.textContent = "";
+    refreshNextButton();
   }
 
   function onNewListNameChange() {
-    if (!btn) return;
-    if (!chk?.checked) {
-      btn.disabled = true;
-      return;
+    if (!chk.checked) {
+      btnCreate.disabled = true;
+    } else {
+      btnCreate.disabled = !(inp.value.trim().length > 0);
     }
-    btn.disabled = !(inp && inp.value.trim().length > 0);
+    refreshNextButton();
   }
 
+  // -------------------------
+  // Create contact list (POST a tu backend UI)
+  // -------------------------
   async function onCreateClick() {
     try {
-      if (!inp || !inp.value.trim()) return;
+      const name = inp.value.trim();
+      if (!name) return;
 
       status.textContent = "Creando lista...";
-      status.style.color = "#6b7280";
-      btn.disabled = true;
+      status.className = "";
+      btnCreate.disabled = true;
 
       const payload = {
-        name: inp.value.trim(),
-        columnNames: [
-          "request_id",
-          "contact_key",
-          "phone_number",
-          "status"
-        ],
-        phoneColumns: [
-          {
-            columnName: "phone_number",
-            type: "cell"
-          }
-        ]
+        name,
+        columnNames: ["request_id", "contact_key", "phone_number", "status"],
+        phoneColumns: [{ columnName: "phone_number", type: "cell" }]
       };
 
+      // ✅ importante: MISMO ORIGIN, para evitar CORS
       const res = await fetch("/api/ui/contactlists-create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -88,115 +115,119 @@
       });
 
       if (!res.ok) {
-        const err = await res.json();
+        const err = await res.json().catch(() => ({}));
         throw new Error(err.error || "Error creando lista");
       }
 
       const data = await res.json();
 
-      // actualizar UI con lo que responde el backend
-      status.textContent = `Lista creada: ${data.name}`;
-      status.style.color = "#065f46";
+      // agregar al combo (aunque esté disabled, igual mantenemos lista)
+      const opt = document.createElement("option");
+      opt.value = data.id;
+      opt.textContent = data.name;
+      select.appendChild(opt);
 
-      // seleccionar automáticamente la nueva lista
-      if (select) {
-        const opt = document.createElement("option");
-        opt.value = data.id;
-        opt.textContent = data.name;
-        select.appendChild(opt);
-        select.value = data.id;
-      }
-
+      // ya creada: cambia a modo "existente"
       chk.checked = false;
       toggleNewListInput();
 
+      // seleccionar la creada
+      select.value = data.id;
+
+      status.textContent = `Lista creada: ${data.name}`;
+      status.className = "ok";
+
+      refreshNextButton();
     } catch (e) {
       status.textContent = e.message;
-      status.style.color = "#b91c1c";
-      btn.disabled = false;
+      status.className = "err";
+      btnCreate.disabled = false;
     }
-}
+  }
 
-
-  /* === 1️⃣ INIT DESDE SFMC === */
-  connection.on("initActivity", function (data) {
-    const args0 = data?.arguments?.execute?.inArguments?.[0] || {};
-
-    savedContactListId = args0.contactListId || "";
-
-    if (chk) chk.checked = !!args0.useNewList;
-    if (inp) inp.value = args0.newListName || "";
-
-    // si ya estaba configurado y era "crear nueva", bloquea checkbox para no romper estado
-    // (opcional, pero ayuda a que no se pierda el id guardado)
-    if (chk?.checked && savedContactListId) {
-      if (chk) chk.disabled = true;
-      if (inp) inp.disabled = true;
-      if (btn) btn.disabled = true;
-      setStatus("Lista ya creada previamente (configurada).", "ok");
-    } else {
-      toggleNewListInput();
-      onNewListNameChange();
-    }
-  });
-
-  /* === 2️⃣ CARGA UI === */
-  document.addEventListener("DOMContentLoaded", async () => {
-    if (!select) return;
-
+  // -------------------------
+  // Load contact lists
+  // -------------------------
+  async function loadContactLists() {
     select.innerHTML = `<option value="">Cargando...</option>`;
     select.disabled = true;
 
-    // listeners
+    const res = await fetch("/api/ui/contactlists");
+    const data = await res.json();
+
+    select.innerHTML = `<option value="">Seleccione una lista...</option>`;
+    data.forEach((item) => {
+      const opt = document.createElement("option");
+      opt.value = item.id;
+      opt.textContent = item.name;
+      select.appendChild(opt);
+    });
+
+    // aplica selección guardada si no está en modo nueva lista
+    if (savedContactListId && !chk.checked) select.value = savedContactListId;
+
+    // re-aplicar estado según checkbox
     toggleNewListInput();
-    if (chk) chk.addEventListener("change", toggleNewListInput);
-    if (inp) inp.addEventListener("input", onNewListNameChange);
-    if (btn) btn.addEventListener("click", onCreateClick);
+  }
 
-    try {
-      const res = await fetch("/api/ui/contactlists");
-      const data = await res.json();
+  // -------------------------
+  // Load campaigns (step 2)
+  // -------------------------
+  let campaignsLoaded = false;
+  async function loadCampaignsOnce() {
+    if (campaignsLoaded) return;
+    campaignsLoaded = true;
 
-      select.innerHTML = `<option value="">Seleccione una lista...</option>`;
+    campaignSelect.innerHTML = `<option value="">Cargando...</option>`;
+    campaignSelect.disabled = true;
 
-      (data || []).forEach((item) => {
-        const opt = document.createElement("option");
-        opt.value = item.id;
-        opt.textContent = item.name;
-        select.appendChild(opt);
-      });
+    // ⬅️ aquí apuntas a TU endpoint de campañas (cuando lo tengas)
+    // por ahora lo dejo con el nombre correcto para que lo crees igual que contactlists.
+    const res = await fetch("/api/ui/campaigns");
+    const data = await res.json();
 
-      // aplicar selección guardada solo si NO está en modo "crear nueva"
-      if (savedContactListId && !(chk && chk.checked)) {
-        select.value = savedContactListId;
-      }
+    campaignSelect.innerHTML = `<option value="">Seleccione una campaña...</option>`;
+    data.forEach((c) => {
+      const opt = document.createElement("option");
+      opt.value = c.id;
+      opt.textContent = c.name;
+      campaignSelect.appendChild(opt);
+    });
 
-      // NO forzar enabled: depende del checkbox
-      toggleNewListInput();
+    if (savedCampaignId) campaignSelect.value = savedCampaignId;
 
-      connection.trigger("ready");
-    } catch (e) {
-      console.error(e);
-      select.innerHTML = `<option value="">Error cargando listas</option>`;
-      connection.trigger("ready");
-    }
+    campaignSelect.disabled = false;
+  }
+
+  // -------------------------
+  // SFMC init + save
+  // -------------------------
+  connection.on("initActivity", function (data) {
+    const args = data?.arguments?.execute?.inArguments?.[0] || {};
+
+    savedContactListId = args.contactListId || "";
+    savedCampaignId = args.campaignId || "";
+
+    chk.checked = !!args.useNewList;
+    inp.value = args.newListName || "";
+
+    toggleNewListInput();
+    refreshNextButton();
   });
 
-  /* === 3️⃣ GUARDAR AL DAR "LISTO" === */
   connection.on("clickedNext", save);
   connection.on("clickedDone", save);
 
   function save() {
-    const useNew = !!chk?.checked;
-
     const payload = {
       arguments: {
         execute: {
           inArguments: [
             {
-              contactListId: useNew ? savedContactListId : (select?.value || ""),
-              useNewList: useNew,
-              newListName: useNew ? (inp?.value || "") : ""
+              contactListId: select.value,
+              useNewList: chk.checked,
+              newListName: chk.checked ? inp.value : "",
+              campaignId: campaignSelect ? campaignSelect.value : ""
             }
           ]
         }
@@ -205,4 +236,34 @@
 
     connection.trigger("updateActivity", payload);
   }
+
+  // -------------------------
+  // DOM Ready
+  // -------------------------
+  document.addEventListener("DOMContentLoaded", async () => {
+    // listeners
+    chk.addEventListener("change", toggleNewListInput);
+    inp.addEventListener("input", onNewListNameChange);
+    select.addEventListener("change", refreshNextButton);
+
+    btnCreate.disabled = true;
+    btnCreate.addEventListener("click", onCreateClick);
+
+    btnNext.addEventListener("click", async () => {
+      if (!canGoNext()) return;
+      goTo(2);
+      await loadCampaignsOnce();
+    });
+
+    btnBack.addEventListener("click", () => goTo(1));
+
+    // load step 1 data
+    try {
+      await loadContactLists();
+      connection.trigger("ready"); // quita spinner
+    } catch (e) {
+      select.innerHTML = `<option>Error cargando listas</option>`;
+      connection.trigger("ready");
+    }
+  });
 })();

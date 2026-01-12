@@ -40,9 +40,7 @@
   }
 
   function canGoNext() {
-    // si usa nueva lista: exige nombre
     if (chk.checked) return !!inp.value.trim();
-    // si NO usa nueva lista: exige seleccionar contactListId
     return !!select.value;
   }
 
@@ -58,14 +56,12 @@
     const useNew = !!chk?.checked;
 
     if (useNew) {
-      // reset & disable combo
       select.value = "";
       select.selectedIndex = 0;
       select.disabled = true;
 
       inp.disabled = false;
 
-      // botón crear: solo si hay nombre
       btnCreate.disabled = !(inp.value.trim().length > 0);
     } else {
       select.disabled = false;
@@ -76,7 +72,10 @@
       btnCreate.disabled = true;
     }
 
-    if (status) status.textContent = "";
+    if (status) {
+      status.textContent = "";
+      status.className = "status"; // ✅ no borrar estilos base
+    }
     refreshNextButton();
   }
 
@@ -98,7 +97,7 @@
       if (!name) return;
 
       status.textContent = "Creando lista...";
-      status.className = "";
+      status.className = "status";
       btnCreate.disabled = true;
 
       const payload = {
@@ -107,27 +106,32 @@
         phoneColumns: [{ columnName: "phone_number", type: "cell" }]
       };
 
-      // ✅ importante: MISMO ORIGIN, para evitar CORS
       const res = await fetch("/api/ui/contactlists-create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
 
+      // ✅ robusto: puede venir texto o JSON
       if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || "Error creando lista");
+        const text = await res.text().catch(() => "");
+        let msg = text;
+        try {
+          const j = JSON.parse(text);
+          msg = j?.error || j?.message || text;
+        } catch {}
+        throw new Error(msg || "Error creando lista");
       }
 
       const data = await res.json();
 
-      // agregar al combo (aunque esté disabled, igual mantenemos lista)
+      // agregar al combo
       const opt = document.createElement("option");
       opt.value = data.id;
       opt.textContent = data.name;
       select.appendChild(opt);
 
-      // ya creada: cambia a modo "existente"
+      // volver a modo existente
       chk.checked = false;
       toggleNewListInput();
 
@@ -135,12 +139,11 @@
       select.value = data.id;
 
       status.textContent = `Lista creada: ${data.name}`;
-      status.className = "ok";
-
+      status.className = "status ok"; // ✅ mantener clase status
       refreshNextButton();
     } catch (e) {
       status.textContent = e.message;
-      status.className = "err";
+      status.className = "status err"; // ✅ mantener clase status
       btnCreate.disabled = false;
     }
   }
@@ -163,10 +166,8 @@
       select.appendChild(opt);
     });
 
-    // aplica selección guardada si no está en modo nueva lista
     if (savedContactListId && !chk.checked) select.value = savedContactListId;
 
-    // re-aplicar estado según checkbox
     toggleNewListInput();
   }
 
@@ -181,8 +182,6 @@
     campaignSelect.innerHTML = `<option value="">Cargando...</option>`;
     campaignSelect.disabled = true;
 
-    // ⬅️ aquí apuntas a TU endpoint de campañas (cuando lo tengas)
-    // por ahora lo dejo con el nombre correcto para que lo crees igual que contactlists.
     const res = await fetch("/api/ui/campaigns");
     const data = await res.json();
 
@@ -241,7 +240,6 @@
   // DOM Ready
   // -------------------------
   document.addEventListener("DOMContentLoaded", async () => {
-    // listeners
     chk.addEventListener("change", toggleNewListInput);
     inp.addEventListener("input", onNewListNameChange);
     select.addEventListener("change", refreshNextButton);
@@ -257,10 +255,9 @@
 
     btnBack.addEventListener("click", () => goTo(1));
 
-    // load step 1 data
     try {
       await loadContactLists();
-      connection.trigger("ready"); // quita spinner
+      connection.trigger("ready");
     } catch (e) {
       select.innerHTML = `<option>Error cargando listas</option>`;
       connection.trigger("ready");

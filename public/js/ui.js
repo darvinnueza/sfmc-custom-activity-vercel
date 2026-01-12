@@ -8,17 +8,31 @@
 
   let savedContactListId = "";
 
+  // ✅ NUEVO: habilita/deshabilita input según checkbox
+  function toggleNewListInput() {
+    if (!chk || !inp) return;
+    inp.disabled = !chk.checked;
+    if (!chk.checked) inp.value = "";
+  }
+
   /* === 1️⃣ INIT DESDE SFMC === */
   connection.on("initActivity", function (data) {
     savedContactListId = data?.arguments?.execute?.inArguments?.[0]?.contactListId || "";
     if (chk) chk.checked = data?.arguments?.execute?.inArguments?.[0]?.useNewList || false;
     if (inp) inp.value = data?.arguments?.execute?.inArguments?.[0]?.newListName || "";
+
+    // ✅ NUEVO: aplicar estado del input al cargar
+    toggleNewListInput();
   });
 
   /* === 2️⃣ CARGA UI === */
   document.addEventListener("DOMContentLoaded", async () => {
     select.innerHTML = `<option value="">Cargando...</option>`;
     select.disabled = true;
+
+    // ✅ NUEVO: estado inicial + listener del checkbox
+    toggleNewListInput();
+    if (chk) chk.addEventListener("change", toggleNewListInput);
 
     try {
       const res = await fetch("/api/ui/contactlists");
@@ -58,7 +72,8 @@
             {
               contactListId: select.value,
               useNewList: chk.checked,
-              newListName: inp.value
+              // ✅ NUEVO: si no está marcado, guardar vacío
+              newListName: chk.checked ? inp.value : ""
             }
           ]
         }

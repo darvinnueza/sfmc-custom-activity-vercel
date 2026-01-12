@@ -1,31 +1,34 @@
 document.addEventListener("DOMContentLoaded", async () => {
   const select = document.getElementById("campaignSelect");
+
   if (!select) return;
 
+  // Estado inicial
+  select.innerHTML = `<option>Cargando...</option>`;
+  select.disabled = true;
+
   try {
-    const res = await fetch("/api/ui/contactlists");
-    if (!res.ok) throw new Error("HTTP " + res.status);
+    const res = await fetch(
+      "https://custom-activity-service-demo.vercel.app/api/ui/contactlists"
+    );
+
+    if (!res.ok) throw new Error("HTTP error");
 
     const data = await res.json();
 
-    // reset
     select.innerHTML = "";
 
-    // placeholder
-    const ph = document.createElement("option");
-    ph.value = "";
-    ph.textContent = "Seleccione una lista...";
-    select.appendChild(ph);
-
-    // opciones
-    data.forEach((item) => {
+    data.forEach(item => {
       const opt = document.createElement("option");
-      opt.value = item.id;     // id real
-      opt.textContent = item.name; // name real
+      opt.value = item.id;
+      opt.textContent = item.name;
       select.appendChild(opt);
     });
+
+    select.disabled = false;
+
   } catch (err) {
-    console.error("Error cargando listas:", err);
+    console.error("Error cargando listas", err);
     select.innerHTML = `<option>Error cargando listas</option>`;
   }
 });
